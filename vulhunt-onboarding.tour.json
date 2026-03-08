@@ -1,0 +1,232 @@
+{
+  "id": "vulhunt-onboarding",
+  "title": "VulHunt Community Edition — Codebase Tour",
+  "description": "A guided walkthrough of the VulHunt vulnerability hunting framework, its Rust workspace architecture, and key subsystems",
+  "version": "1.0.0",
+  "audience": "New Contributors & Security Researchers",
+  "prerequisites": [
+    "Basic Rust knowledge",
+    "Familiarity with binary analysis concepts"
+  ],
+  "steps": [
+    {
+      "id": "step-1-overview",
+      "title": "Welcome to VulHunt",
+      "description": "VulHunt Community Edition is a vulnerability hunting framework built on BIAS (Binary Analysis and Inspection System). The repo is a Rust workspace with 13 crates spanning the CLI, core analysis framework, rule engine, MCP server, and compatibility layers. Let's explore how it all fits together.",
+      "estimatedTime": 60,
+      "colorMode": "fileTypes"
+    },
+    {
+      "id": "step-2-cli-entry",
+      "title": "CLI Entry Point — bias-vulhunt",
+      "description": "The main binary (vulhunt-ce) lives here. It provides four subcommands: scan (analyze binaries), mcp (start the MCP server), btp (Binarly Transparency Platform integration), and ba2 (archive management). Start here to understand how users interact with the tool.",
+      "estimatedTime": 90,
+      "focusDirectory": "bias-vulhunt/src",
+      "highlightLayers": [
+        {
+          "id": "cli-entry",
+          "name": "CLI Entry & Commands",
+          "color": "#3b82f6",
+          "items": [
+            { "path": "bias-vulhunt/src/main.rs", "type": "file" },
+            { "path": "bias-vulhunt/src/scan.rs", "type": "file" },
+            { "path": "bias-vulhunt/src/mcp.rs", "type": "file" },
+            { "path": "bias-vulhunt/src/btp.rs", "type": "file" },
+            { "path": "bias-vulhunt/src/ba2.rs", "type": "file" }
+          ],
+          "opacity": 0.7,
+          "borderWidth": 2
+        }
+      ],
+      "colorMode": "fileTypes"
+    },
+    {
+      "id": "step-3-bias-core",
+      "title": "Analysis Engine — bias-core",
+      "description": "The heart of the framework. bias-core contains the static analysis infrastructure: intermediate representation (ir/), control flow graphs (cfg/), knowledge base (kb/), architecture support (arch/), binary loaders (loader/), decompiler integration (decompiler/), and EFI/UEFI analysis (efi/). This is the largest crate in the workspace.",
+      "estimatedTime": 180,
+      "focusDirectory": "bias-core/src",
+      "highlightLayers": [
+        {
+          "id": "core-analysis",
+          "name": "Analysis Modules",
+          "color": "#8b5cf6",
+          "items": [
+            { "path": "bias-core/src/analyses", "type": "directory" },
+            { "path": "bias-core/src/ir", "type": "directory" },
+            { "path": "bias-core/src/cfg", "type": "directory" },
+            { "path": "bias-core/src/kb", "type": "directory" }
+          ],
+          "opacity": 0.6
+        },
+        {
+          "id": "core-platform",
+          "name": "Platform & Arch Support",
+          "color": "#10b981",
+          "items": [
+            { "path": "bias-core/src/arch", "type": "directory" },
+            { "path": "bias-core/src/efi", "type": "directory" },
+            { "path": "bias-core/src/loader", "type": "directory" },
+            { "path": "bias-core/src/decompiler", "type": "directory" }
+          ],
+          "opacity": 0.6
+        }
+      ],
+      "colorMode": "fileTypes"
+    },
+    {
+      "id": "step-4-rule-engine",
+      "title": "Rule Engine — bias-vulhunt-engine",
+      "description": "This is where vulnerability detection rules are defined and executed. Rules are written in Lua (via LuaJIT/mlua bindings). The engine evaluates rules against the analysis results from bias-core. Key files: engine.rs (core execution), lua/ (API bindings, prelude, and checker), and analysis/ (rule-specific analysis passes).",
+      "estimatedTime": 120,
+      "focusDirectory": "bias-vulhunt-engine/src",
+      "highlightLayers": [
+        {
+          "id": "engine-core",
+          "name": "Engine Core",
+          "color": "#f59e0b",
+          "items": [
+            { "path": "bias-vulhunt-engine/src/engine.rs", "type": "file" },
+            { "path": "bias-vulhunt-engine/src/lib.rs", "type": "file" }
+          ],
+          "opacity": 0.7,
+          "borderWidth": 2
+        },
+        {
+          "id": "lua-integration",
+          "name": "Lua Scripting Layer",
+          "color": "#06b6d4",
+          "items": [
+            { "path": "bias-vulhunt-engine/src/lua", "type": "directory" }
+          ],
+          "opacity": 0.7
+        }
+      ],
+      "colorMode": "fileTypes"
+    },
+    {
+      "id": "step-5-orchestration",
+      "title": "Orchestration & Reporting — bias",
+      "description": "The bias crate ties everything together. It handles component and package management, platform-specific loader configuration, the analysis pipeline, and result reporting. Think of it as the glue between the CLI, core analysis, and rule engine.",
+      "estimatedTime": 90,
+      "focusDirectory": "bias/src",
+      "highlightLayers": [
+        {
+          "id": "orchestration-pipeline",
+          "name": "Pipeline & Reporting",
+          "color": "#ec4899",
+          "items": [
+            { "path": "bias/src/pipeline", "type": "directory" },
+            { "path": "bias/src/reporting", "type": "directory" },
+            { "path": "bias/src/component.rs", "type": "file" }
+          ],
+          "opacity": 0.7
+        },
+        {
+          "id": "orchestration-loaders",
+          "name": "Loaders & Platforms",
+          "color": "#f97316",
+          "items": [
+            { "path": "bias/src/loader", "type": "directory" },
+            { "path": "bias/src/platform", "type": "directory" }
+          ],
+          "opacity": 0.6
+        }
+      ],
+      "colorMode": "fileTypes"
+    },
+    {
+      "id": "step-6-mcp-server",
+      "title": "AI Integration — bias-vulhunt-mcp",
+      "description": "VulHunt can run as an MCP (Model Context Protocol) server, enabling AI assistants to invoke vulnerability scanning tools directly. The server handles project management, session state, and exposes analysis tools over HTTP with SSE transport.",
+      "estimatedTime": 60,
+      "focusDirectory": "bias-vulhunt-mcp/src",
+      "highlightLayers": [
+        {
+          "id": "mcp-server",
+          "name": "MCP Server",
+          "color": "#14b8a6",
+          "items": [
+            { "path": "bias-vulhunt-mcp/src/server.rs", "type": "file" },
+            { "path": "bias-vulhunt-mcp/src/tools.rs", "type": "file" },
+            { "path": "bias-vulhunt-mcp/src/session.rs", "type": "file" },
+            { "path": "bias-vulhunt-mcp/src/project.rs", "type": "file" }
+          ],
+          "opacity": 0.7,
+          "borderWidth": 2
+        }
+      ],
+      "colorMode": "fileTypes"
+    },
+    {
+      "id": "step-7-compat-layers",
+      "title": "Compatibility Layers",
+      "description": "Three crates provide backward compatibility with existing rule formats: bias-compat-fwhunt (FwHunt UEFI rules with GUID/protocol matching), bias-compat-patfind (pattern-based binary search), and bias-compat-flirt (IDA FLIRT signatures). These allow VulHunt to leverage existing detection rule ecosystems.",
+      "estimatedTime": 60,
+      "focusDirectory": "",
+      "highlightLayers": [
+        {
+          "id": "compat-crates",
+          "name": "Compatibility Crates",
+          "color": "#a855f7",
+          "items": [
+            { "path": "bias-compat-fwhunt", "type": "directory" },
+            { "path": "bias-compat-patfind", "type": "directory" },
+            { "path": "bias-compat-flirt", "type": "directory" }
+          ],
+          "opacity": 0.7
+        }
+      ],
+      "colorMode": "fileTypes"
+    },
+    {
+      "id": "step-8-build-config",
+      "title": "Build & Configuration",
+      "description": "The workspace is configured with Cargo.toml at the root. Makefile.toml drives complex build tasks (LuaJIT compilation, LLVM downloads, packaging). The Dockerfile provides a multi-stage build, and CI runs via GitHub Actions for Linux, macOS, and Windows.",
+      "estimatedTime": 60,
+      "focusDirectory": "",
+      "highlightLayers": [
+        {
+          "id": "build-config",
+          "name": "Build Configuration",
+          "color": "#ef4444",
+          "items": [
+            { "path": "Cargo.toml", "type": "file" },
+            { "path": "Makefile.toml", "type": "file" },
+            { "path": "Dockerfile", "type": "file" },
+            { "path": "scripts", "type": "directory" },
+            { "path": ".github", "type": "directory" }
+          ],
+          "opacity": 0.7,
+          "borderWidth": 2
+        }
+      ],
+      "colorMode": "fileTypes"
+    },
+    {
+      "id": "step-9-recent-changes",
+      "title": "Recent Git Activity",
+      "description": "Switch to git color mode to see which files have been recently modified. This gives you a sense of where active development is happening across the workspace.",
+      "estimatedTime": 30,
+      "colorMode": "git"
+    },
+    {
+      "id": "step-10-full-picture",
+      "title": "The Full Picture",
+      "description": "That's the complete VulHunt architecture: CLI (bias-vulhunt) drives the orchestration layer (bias), which uses the core analysis framework (bias-core) and rule engine (bias-vulhunt-engine) to detect vulnerabilities. The MCP server (bias-vulhunt-mcp) enables AI integration, and compatibility crates bridge existing rule formats. Happy hunting!",
+      "estimatedTime": 30,
+      "focusDirectory": "",
+      "colorMode": "fileTypes"
+    }
+  ],
+  "metadata": {
+    "author": "Claude Code",
+    "createdAt": "2026-03-08T00:00:00.000Z",
+    "tags": [
+      "onboarding",
+      "architecture",
+      "security",
+      "binary-analysis"
+    ]
+  }
+}
